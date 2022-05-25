@@ -1,0 +1,17 @@
+version: "3" # 表示使用第三代语法来构建
+
+services: # 需要用 compose 启动的服务
+  build-todo: # 负责打包出html静态文件
+    build: .
+    volumes:
+      - todo-site:/app/dist
+
+  web-server:
+    image: caddy
+    ports:
+      - "4000:80" # 端口映射
+    volumes:
+      - todo-site:/usr/share/caddy/
+
+volumes:
+  todo-site:
