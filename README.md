@@ -38,3 +38,11 @@ pnpm build
 ```sh
 docker-compose up -d
 ```
+
+## 说明
+
+两种写法，一个是函数式组件，还有一个类组件
+
+**组件结构**
+
+![image-20220529145524251](http://i0.hdslb.com/bfs/album/db1f45362d6c7ea2b1a6430a5add5ea8d719fdff.png)
