@@ -16,8 +16,8 @@ function App() {
   /**
    * 修改当前值,每次输入字符的时候都修改state中的当前值
    */
-  function handleInputValue(val) {
-    curVal = val.target.value;
+  function handleInputValue(event) {
+    setCurVal(event.target.value.trim());
   }
 
   /**
@@ -41,8 +41,8 @@ function App() {
   /**
    * 处理回车事件
    */
-  function handleKeyPress(e) {
-    if (e.keyCode === 13) addTodoItem();
+  function handleKeyPress(event) {
+    if (event.keyCode === 13) addTodoItem();
   }
 
   /**
@@ -86,134 +86,172 @@ function App() {
    */
   function completedAllItem() {
     setTodos(
-      todos.map((todo) => {
-        return {
-          ...todo,
-          completed: true,
-        };
-      })
+      todos.reduce((acc, cur) => acc.concat({ ...cur, completed: true }), [])
     );
   }
+
+  /**
+   * 修改当前的完成情况
+   */
+
+  function check(todo) {
+    const copyTodos = [...todos];
+    copyTodos.forEach((val) => {
+      if (val.title === todo.title) {
+        val.completed = !val.completed;
+      }
+    });
+    setTodos(copyTodos);
+  }
+
   return (
     <div className="h-100 w-full flex items-center justify-center font-sans  bg-[#e8fffe7e]">
       <div className="bg-white rounded-lg shadow-lg p-6 m-4 w-full lg:w-3/4 lg:max-w-lg">
-        <div className="mb-4 ">
-          <h1 className="text-4xl font-medium text-center">ToDo List</h1>
-          <div className="flex mt-4">
-            <input
-              type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 mr-4 text-grey-darker"
-              placeholder="Add Todo"
-              onKeyDown={handleKeyPress.bind(this)}
-              onChange={handleInputValue.bind(this)}
-            />
-            <button
-              className="flex  p-2 border-2 rounded text-green-300 border-green-300 hover:text-white hover:bg-green-300"
-              onClick={addTodoItem}
-            >
-              <svg
-                className="h-6 w-6"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                {" "}
-                <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                <circle cx="12" cy="12" r="9" />{" "}
-                <line x1="9" y1="12" x2="15" y2="12" />{" "}
-                <line x1="12" y1="9" x2="12" y2="15" />
-              </svg>
-              <span>Add</span>
-            </button>
-          </div>
-        </div>
+        <Header
+          addTodoItem={addTodoItem}
+          handleKeyPress={handleKeyPress}
+          handleInputValue={handleInputValue}
+          value={curVal}
+        />
         <ul className={isHidden && "hidden"}>
           {todos.map((todo) => (
             <ListItem
               title={todo.title}
               key={todo.title}
               completed={todo.completed}
-              check={() => {
-                let copy = JSON.parse(JSON.stringify(todos));
-                for (let i = 0; i < copy.length; i++) {
-                  if (copy[i].title === todo.title) {
-                    copy[i].completed = !copy[i].completed;
-                  }
-                }
-                setTodos(copy);
-              }}
+              check={() => check(todo)}
               onDelete={() =>
                 setTodos(todos.filter((i) => todo.title !== i.title))
               }
             />
           ))}
         </ul>
-        <div>
-          <span className="text">Remainder: {todos.length}</span>
-          <button
-            className="border-2 border-indigo-500 p-2 text-indigo-500 ml-4"
-            onClick={() => setHidden(!isHidden)}
-          >
-            {isHidden ? "Show" : "Hidden"}
-          </button>
-          <button
-            onClick={completedAllItem}
-            className="border-2 border-indigo-500 p-2 text-indigo-500 ml-4"
-          >
-            DoneAll
-          </button>
-          <button
-            className="border-2 border-red-500 p-2 text-red-500 ml-4"
-            onClick={() => setTodos([])}
-          >
-            Reset
-          </button>
-        </div>
+        <Footer
+          length={todos.length}
+          hidden={() => setHidden(!isHidden)}
+          hiddenStatus={isHidden}
+          completedAllItem={completedAllItem}
+          deleteAll={() => setTodos([])}
+        />
       </div>
     </div>
   );
+}
 
-  /**
-   * 子组件
-   * 根据接收的props(属性)渲染出子元素, props时组件对外的接口, props是只读的属性,组件内部不能修改props
-   * 只能在该组件的上层组件中修改。
-   */
-  function ListItem(props) {
-    return (
-      <div className="flex mb-4 items-center" key={props.key}>
-        <p
-          className={
-            props.completed
-              ? "w-full line-through text-green-500 text-lg"
-              : "w-full text-gray-600 text-lg"
-          }
-        >
-          {props.title}
-        </p>
+function Header(props) {
+  return (
+    <div className="mb-4 ">
+      <h1 className="text-4xl font-medium text-center">ToDo List</h1>
+      <div className="flex mt-4">
+        <input
+          type="text"
+          className="shadow appearance-none border rounded w-full py-2 px-3 mr-4 text-grey-darker"
+          placeholder="Add Todo"
+          onKeyDown={props.handleKeyPress.bind(this)}
+          onChange={props.handleInputValue.bind(this)}
+          value={props.value}
+        />
         <button
-          className={
-            props.completed
-              ? "flex-no-shrink p-2 ml-4 mr-2 border-2 rounded hover:text-white text-gray-400 border-gray  hover:bg-gray-400"
-              : "flex-no-shrink p-2 ml-4 mr-2 border-2 rounded hover:text-white text-green-400 border-green-400 hover:bg-green-400"
-          }
-          onClick={props.check}
+          className="flex  p-2 border-2 rounded text-green-300 border-green-300 hover:text-white hover:bg-green-300"
+          onClick={props.addTodoItem}
         >
-          {props.completed ? "Undone" : "Done"}
-        </button>
-        <button
-          className="flex-no-shrink p-2 ml-2 border-2 rounded border-red-500 text-red-500 border-red hover:text-white hover:bg-red-600"
-          onClick={props.onDelete}
-        >
-          Remove
+          <AddIcon />
+          <span>Add</span>
         </button>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+/**
+ * 图标组件
+ */
+function AddIcon() {
+  return (
+    <svg
+      className="h-6 w-6"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      stroke-width="2"
+      stroke="currentColor"
+      fill="none"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      {" "}
+      <path stroke="none" d="M0 0h24v24H0z" /> <circle cx="12" cy="12" r="9" />{" "}
+      <line x1="9" y1="12" x2="15" y2="12" />{" "}
+      <line x1="12" y1="9" x2="12" y2="15" />
+    </svg>
+  );
+}
+
+/**
+ * 需要渲染的每一项
+ * 根据接收的props(属性)渲染出子元素, props时组件对外的接口, props是只读的属性,组件内部不能修改props
+ * 只能在该组件的上层组件中修改。
+ */
+function ListItem(props) {
+  return (
+    <div className="flex mb-4 items-center" key={props.key}>
+      <p
+        className={
+          props.completed
+            ? "w-full line-through text-green-500 text-lg"
+            : "w-full text-gray-600 text-lg"
+        }
+      >
+        {props.title}
+      </p>
+      <button
+        className={
+          props.completed
+            ? "flex-no-shrink p-2 ml-4 mr-2 border-2 rounded hover:text-white text-gray-400 border-gray  hover:bg-gray-400"
+            : "flex-no-shrink p-2 ml-4 mr-2 border-2 rounded hover:text-white text-green-400 border-green-400 hover:bg-green-400"
+        }
+        onClick={props.check}
+      >
+        {props.completed ? "Undone" : "Done"}
+      </button>
+      <button
+        className="flex-no-shrink p-2 ml-2 border-2 rounded border-red-500 text-red-500 border-red hover:text-white hover:bg-red-600"
+        onClick={props.onDelete}
+      >
+        Remove
+      </button>
+    </div>
+  );
+}
+
+/**
+ * 底部栏子组件
+ */
+
+function Footer(props) {
+  return (
+    <div>
+      <span className="text">Remainder: {props.length}</span>
+      <button
+        className="border-2 border-indigo-500 p-2 text-indigo-500 ml-4"
+        onClick={props.hidden}
+      >
+        {props.hiddenStatus ? "Show" : "Hidden"}
+      </button>
+      <button
+        onClick={props.completedAllItem}
+        className="border-2 border-indigo-500 p-2 text-indigo-500 ml-4"
+      >
+        DoneAll
+      </button>
+      <button
+        className="border-2 border-red-500 p-2 text-red-500 ml-4"
+        onClick={props.deleteAll}
+      >
+        Reset
+      </button>
+    </div>
+  );
 }
 
 function container() {
