@@ -5,4 +5,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   base: "./", //配置默认根路径,不配置打包出来的文件路径会有问题
+  build: {
+    outDir: "docs",
+  },
 });

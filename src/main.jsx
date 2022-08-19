@@ -1,11 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import App1 from "./classComponent";
-import App2 from "./functionComponent";
+import App from "./app";
+import { HoxRoot } from "hox";
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    {/* <App1 /> */}
-    <App2 />
-  </React.StrictMode>
+  // 全局Store 此处注册供全局组件调用
+  <HoxRoot>
+    <App />
+  </HoxRoot>
 );
