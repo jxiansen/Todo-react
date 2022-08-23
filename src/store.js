@@ -1,5 +1,6 @@
 import { createGlobalStore } from "hox";
 import { useEffect, useState } from "react";
+import db from "./db";
 
 function useTodo() {
   // 所有的 todos 数组
@@ -7,10 +8,9 @@ function useTodo() {
   const [isShow, setShow] = useState(true);
 
   useEffect(() => {
-    if (localStorage.data) {
-      const todos = JSON.parse(localStorage.data);
+    db.todos.toArray().then((todos) => {
       setTodos(todos);
-    }
+    });
     console.log("Code By Mr-j👀");
     console.log("Welcome to Star 'https://github.com/jxiansen/Todo-react'");
   }, []);
@@ -19,7 +19,9 @@ function useTodo() {
     每次 todos 变动重新存入 localStorage 中
   */
   useEffect(() => {
-    localStorage.data = JSON.stringify(todos);
+    // 先清空数据再将内存中的数据添加到数据库中
+    db.todos.clear();
+    db.todos.bulkAdd(todos);
   }, [todos]);
 
   /* 
@@ -30,7 +32,7 @@ function useTodo() {
     setTodos(
       todos.concat([
         {
-          id: Math.random().toString(),
+          id: new Date().getTime().toString(),
           content,
           completed: false,
         },

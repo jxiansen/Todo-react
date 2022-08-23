@@ -9,7 +9,7 @@ services: # 需要用 compose 启动的服务
   web-server:
     image: caddy
     ports:
-      - "4000:80" # 端口映射
+      - "5000:80" # 端口映射
     volumes:
       - todo-site:/usr/share/caddy/
 

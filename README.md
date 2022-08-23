@@ -54,3 +54,5 @@ hox：阿里开源的下一个 React 状态管理工具
 **组件结构**
 
 ![image-20220529145524251](http://i0.hdslb.com/bfs/album/db1f45362d6c7ea2b1a6430a5add5ea8d719fdff.png)
+
+8 月 23 号改版数据存储在 indexedDB 中，不存储在 localStorage
